@@ -34,5 +34,7 @@
 @property (nonatomic, assign) NSString *placeholder;
 @property (nonatomic, retain) UILabel *placeHolderLabel;
 
+@property (nonatomic, assign) BOOL isEditing;
+
 @end
 

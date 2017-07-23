@@ -89,6 +89,14 @@
     self.delegate = delegate;
 }
 
+- (void)ccui_setEditingState:(BOOL)isEditing
+{
+    SEL selector = @selector(setEditingState:);
+    if ([self respondsToSelector:selector]) {
+        [self performSelector:selector withObject:[NSNumber numberWithBool:isEditing]];
+    }
+}
+
 @end
 
 

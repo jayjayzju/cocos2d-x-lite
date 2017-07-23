@@ -327,6 +327,7 @@
 {
     CCLOG("textFieldShouldBeginEditing...");
     _editState = YES;
+    [self.textInput ccui_setEditingState:YES];
 
     auto view = cocos2d::Director::getInstance()->getOpenGLView();
     CCEAGLView *eaglview = (CCEAGLView *) view->getEAGLView();
@@ -343,6 +344,7 @@
 {
     CCLOG("textFieldShouldEndEditing...");
     _editState = NO;
+    [self.textInput ccui_setEditingState:NO];
     getEditBoxImplIOS()->refreshInactiveText();
 
     const char* inputText = [textView.text UTF8String];

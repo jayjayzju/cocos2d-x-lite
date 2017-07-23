@@ -102,6 +102,13 @@ CGFloat const UI_PLACEHOLDER_TEXT_CHANGED_ANIMATION_DURATION = 0.25;
     return _placeHolderLabel;
 }
 
+- (void)setEditingState:(NSNumber *)isEditing
+{
+    self.isEditing = [isEditing boolValue];
+    if (self.isEditing) self.placeHolderLabel.alpha = 0;
+    else self.placeHolderLabel.alpha = 1;
+}
+
 #pragma mark - Public methods
 
 - (CGRect)textRectForBounds:(CGRect)bounds
@@ -129,7 +136,8 @@ CGFloat const UI_PLACEHOLDER_TEXT_CHANGED_ANIMATION_DURATION = 0.25;
 - (void)drawRect:(CGRect)rect
 {
     if (self.text.length == 0 && self.placeholder.length > 0) {
-        self.placeHolderLabel.alpha = 1;
+        if (self.isEditing) self.placeHolderLabel.alpha = 0;
+        else self.placeHolderLabel.alpha = 1;
     }
 
     [super drawRect:rect];
@@ -143,11 +151,11 @@ CGFloat const UI_PLACEHOLDER_TEXT_CHANGED_ANIMATION_DURATION = 0.25;
         return;
     }
 
-    [UIView animateWithDuration:UI_PLACEHOLDER_TEXT_CHANGED_ANIMATION_DURATION animations:^{
-
-        CGFloat alpha = (self.text.length == 0 ? 1 : 0);
-        self.placeHolderLabel.alpha = alpha;
-    }];
+//    [UIView animateWithDuration:UI_PLACEHOLDER_TEXT_CHANGED_ANIMATION_DURATION animations:^{
+//
+//        CGFloat alpha = (self.text.length == 0 ? 1 : 0);
+//        self.placeHolderLabel.alpha = alpha;
+//    }];
 }
 
 @end

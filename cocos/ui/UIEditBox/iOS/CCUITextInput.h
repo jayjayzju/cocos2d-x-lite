@@ -41,6 +41,8 @@ static const int CC_EDIT_BOX_PADDING = 5;
 /* can only set. and not get, since the getter will only return one delegate implementation */
 - (void)ccui_setDelegate:(id<UITextFieldDelegate, UITextViewDelegate>)delegate;
 
+- (void)ccui_setEditingState:(BOOL)isEditing;
+
 @end
 
 #endif

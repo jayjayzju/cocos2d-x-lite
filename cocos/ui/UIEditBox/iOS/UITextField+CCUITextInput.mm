@@ -81,6 +81,11 @@
     self.delegate = delegate;
 }
 
+- (void)ccui_setEditingState:(BOOL)isEditing
+{
+    // nothing
+}
+
 @end
 
 
