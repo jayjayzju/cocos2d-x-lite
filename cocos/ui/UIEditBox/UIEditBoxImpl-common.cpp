@@ -225,6 +225,13 @@ void EditBoxImplCommon::setReturnType(EditBox::KeyboardReturnType returnType)
 void EditBoxImplCommon::refreshInactiveText()
 {
     setInactiveText(_text.c_str());
+    if (true == isEditing())
+    {
+        _label->setVisible(false);
+        _labelPlaceHolder->setVisible(false);
+        return;
+    }
+    
     if (!_editingMode) {
         if(_text.empty())
         {

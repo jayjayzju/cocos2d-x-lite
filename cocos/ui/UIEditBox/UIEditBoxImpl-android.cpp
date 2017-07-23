@@ -82,6 +82,7 @@ EditBoxImplAndroid::EditBoxImplAndroid(EditBox* pEditText)
 : EditBoxImplCommon(pEditText)
 , _editBoxIndex(-1)
 {
+    _isEditing = false;
 }
 
 EditBoxImplAndroid::~EditBoxImplAndroid()
@@ -176,7 +177,7 @@ void EditBoxImplAndroid::setNativeReturnType(EditBox::KeyboardReturnType returnT
 
 bool EditBoxImplAndroid::isEditing()
 {
-    return false;
+    return _isEditing;
 }
 
 void EditBoxImplAndroid::setNativeText(const char* pText)
@@ -218,6 +219,7 @@ void editBoxEditingDidBegin(int index)
     auto it = s_allEditBoxes.find(index);
     if (it != s_allEditBoxes.end())
     {
+        s_allEditBoxes[index]->_isEditing = true;
         s_allEditBoxes[index]->editBoxEditingDidBegin();
     }
 }
@@ -236,6 +238,7 @@ void editBoxEditingDidEnd(int index, const std::string& text)
     auto it = s_allEditBoxes.find(index);
     if (it != s_allEditBoxes.end())
     {
+        s_allEditBoxes[index]->_isEditing = false;
         s_allEditBoxes[index]->editBoxEditingDidEnd(text);
     }
 }

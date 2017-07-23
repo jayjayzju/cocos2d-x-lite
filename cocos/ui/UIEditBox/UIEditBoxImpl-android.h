@@ -72,6 +72,8 @@ public:
     virtual void nativeCloseKeyboard() override;
     virtual void setNativeMaxLength(int maxLength);
     
+    bool _isEditing;
+    
 private:
     int _editBoxIndex;
 };
