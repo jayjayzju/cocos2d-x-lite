@@ -186,7 +186,7 @@ void EditBoxImplAndroid::setNativeText(const char* pText)
 
 void EditBoxImplAndroid::setNativePlaceHolder(const char* pText)
 {
-    JniHelper::callStaticVoidMethod(editBoxClassName, "setPlaceHolderText", _editBoxIndex, pText);
+//    JniHelper::callStaticVoidMethod(editBoxClassName, "setPlaceHolderText", _editBoxIndex, pText);
 }
 
 void EditBoxImplAndroid::setNativeVisible(bool visible)
