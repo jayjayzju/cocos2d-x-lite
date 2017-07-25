@@ -145,6 +145,28 @@
 		4DFA4C111CBCC49000E3B736 /* jsb_creator_auto.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 4DFA4C0E1CBCC49000E3B736 /* jsb_creator_auto.cpp */; };
 		4DFA4C121CBCC49000E3B736 /* jsb_creator_auto.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4DFA4C0F1CBCC49000E3B736 /* jsb_creator_auto.hpp */; };
 		4DFA4C131CBCC49000E3B736 /* jsb_creator_auto.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 4DFA4C0F1CBCC49000E3B736 /* jsb_creator_auto.hpp */; };
+		5B2506041F27336500C0F30C /* NotifyJS.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505EC1F27336500C0F30C /* NotifyJS.cpp */; };
+		5B2506051F27336500C0F30C /* NotifyJS.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B2505ED1F27336500C0F30C /* NotifyJS.h */; };
+		5B2506061F27336500C0F30C /* PBNetwork.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505EF1F27336500C0F30C /* PBNetwork.cpp */; };
+		5B2506071F27336500C0F30C /* PBNetwork.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B2505F01F27336500C0F30C /* PBNetwork.h */; };
+		5B2506081F27336500C0F30C /* PBNetworkMessage.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505F11F27336500C0F30C /* PBNetworkMessage.cpp */; };
+		5B2506091F27336500C0F30C /* PBNetworkMessage.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B2505F21F27336500C0F30C /* PBNetworkMessage.h */; };
+		5B25060A1F27336500C0F30C /* condition.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505F41F27336500C0F30C /* condition.cpp */; };
+		5B25060B1F27336500C0F30C /* ipaddress.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505F51F27336500C0F30C /* ipaddress.cpp */; };
+		5B25060C1F27336500C0F30C /* mutualexclusion.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505F61F27336500C0F30C /* mutualexclusion.cpp */; };
+		5B25060D1F27336500C0F30C /* pthreadcc.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B2505F71F27336500C0F30C /* pthreadcc.h */; };
+		5B25060E1F27336500C0F30C /* semaphore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505F81F27336500C0F30C /* semaphore.cpp */; };
+		5B25060F1F27336500C0F30C /* socketbase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505F91F27336500C0F30C /* socketbase.cpp */; };
+		5B2506101F27336500C0F30C /* socketcc.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B2505FA1F27336500C0F30C /* socketcc.h */; };
+		5B2506111F27336500C0F30C /* socketexception.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505FB1F27336500C0F30C /* socketexception.cpp */; };
+		5B2506121F27336500C0F30C /* tcpsockets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505FC1F27336500C0F30C /* tcpsockets.cpp */; };
+		5B2506131F27336500C0F30C /* threadbase.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505FD1F27336500C0F30C /* threadbase.cpp */; };
+		5B2506141F27336500C0F30C /* threadexception.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505FE1F27336500C0F30C /* threadexception.cpp */; };
+		5B2506151F27336500C0F30C /* udpsockets.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2505FF1F27336500C0F30C /* udpsockets.cpp */; };
+		5B2506271F2733C200C0F30C /* jsb_sy_auto.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2506201F2733C200C0F30C /* jsb_sy_auto.cpp */; };
+		5B2506281F2733C200C0F30C /* jsb_sy_auto.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5B2506211F2733C200C0F30C /* jsb_sy_auto.hpp */; };
+		5B2506291F2733C200C0F30C /* sy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2506221F2733C200C0F30C /* sy.cpp */; };
+		5B25062A1F2733C200C0F30C /* sy.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B2506231F2733C200C0F30C /* sy.h */; };
 		83A5661918DA878400FC31A0 /* jsb_socketio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83A5661718DA878400FC31A0 /* jsb_socketio.cpp */; };
 		83A5661A18DA878400FC31A0 /* jsb_socketio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83A5661718DA878400FC31A0 /* jsb_socketio.cpp */; };
 		83A5661B18DA878400FC31A0 /* jsb_socketio.h in Headers */ = {isa = PBXBuildFile; fileRef = 83A5661818DA878400FC31A0 /* jsb_socketio.h */; };
@@ -277,6 +299,28 @@
 		4DFA4C001CBCBC4E00E3B736 /* js-BindingsExport.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "js-BindingsExport.h"; sourceTree = "<group>"; };
 		4DFA4C0E1CBCC49000E3B736 /* jsb_creator_auto.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsb_creator_auto.cpp; sourceTree = "<group>"; };
 		4DFA4C0F1CBCC49000E3B736 /* jsb_creator_auto.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = jsb_creator_auto.hpp; sourceTree = "<group>"; };
+		5B2505EC1F27336500C0F30C /* NotifyJS.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = NotifyJS.cpp; sourceTree = "<group>"; };
+		5B2505ED1F27336500C0F30C /* NotifyJS.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = NotifyJS.h; sourceTree = "<group>"; };
+		5B2505EF1F27336500C0F30C /* PBNetwork.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PBNetwork.cpp; sourceTree = "<group>"; };
+		5B2505F01F27336500C0F30C /* PBNetwork.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBNetwork.h; sourceTree = "<group>"; };
+		5B2505F11F27336500C0F30C /* PBNetworkMessage.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = PBNetworkMessage.cpp; sourceTree = "<group>"; };
+		5B2505F21F27336500C0F30C /* PBNetworkMessage.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = PBNetworkMessage.h; sourceTree = "<group>"; };
+		5B2505F41F27336500C0F30C /* condition.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = condition.cpp; sourceTree = "<group>"; };
+		5B2505F51F27336500C0F30C /* ipaddress.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = ipaddress.cpp; sourceTree = "<group>"; };
+		5B2505F61F27336500C0F30C /* mutualexclusion.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = mutualexclusion.cpp; sourceTree = "<group>"; };
+		5B2505F71F27336500C0F30C /* pthreadcc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = pthreadcc.h; sourceTree = "<group>"; };
+		5B2505F81F27336500C0F30C /* semaphore.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = semaphore.cpp; sourceTree = "<group>"; };
+		5B2505F91F27336500C0F30C /* socketbase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socketbase.cpp; sourceTree = "<group>"; };
+		5B2505FA1F27336500C0F30C /* socketcc.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = socketcc.h; sourceTree = "<group>"; };
+		5B2505FB1F27336500C0F30C /* socketexception.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = socketexception.cpp; sourceTree = "<group>"; };
+		5B2505FC1F27336500C0F30C /* tcpsockets.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = tcpsockets.cpp; sourceTree = "<group>"; };
+		5B2505FD1F27336500C0F30C /* threadbase.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = threadbase.cpp; sourceTree = "<group>"; };
+		5B2505FE1F27336500C0F30C /* threadexception.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = threadexception.cpp; sourceTree = "<group>"; };
+		5B2505FF1F27336500C0F30C /* udpsockets.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = udpsockets.cpp; sourceTree = "<group>"; };
+		5B2506201F2733C200C0F30C /* jsb_sy_auto.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsb_sy_auto.cpp; sourceTree = "<group>"; };
+		5B2506211F2733C200C0F30C /* jsb_sy_auto.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = jsb_sy_auto.hpp; sourceTree = "<group>"; };
+		5B2506221F2733C200C0F30C /* sy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sy.cpp; sourceTree = "<group>"; };
+		5B2506231F2733C200C0F30C /* sy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sy.h; sourceTree = "<group>"; };
 		83A5661718DA878400FC31A0 /* jsb_socketio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsb_socketio.cpp; sourceTree = "<group>"; };
 		83A5661818DA878400FC31A0 /* jsb_socketio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jsb_socketio.h; sourceTree = "<group>"; };
 		A60A9D401C2008F60070800A /* js_bindings_chipmunk_manual.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = js_bindings_chipmunk_manual.cpp; path = chipmunk/js_bindings_chipmunk_manual.cpp; sourceTree = "<group>"; };
@@ -350,6 +394,8 @@
 		1551A334158F2AB200E66CFE = {
 			isa = PBXGroup;
 			children = (
+				5B2506181F2733C200C0F30C /* Classes */,
+				5B2505EA1F27336500C0F30C /* cpp */,
 				ED3057C61BEC7C8C0083C3ED /* libjs_static.a */,
 				ED0F39451BEC3E8E00E70AD4 /* libjs_static.a */,
 				1A119E2E18BDF19200352BAA /* auto */,
@@ -556,6 +602,84 @@
 			path = box2d;
 			sourceTree = "<group>";
 		};
+		5B2505EA1F27336500C0F30C /* cpp */ = {
+			isa = PBXGroup;
+			children = (
+				5B2505EE1F27336500C0F30C /* protobuf */,
+				5B2505EC1F27336500C0F30C /* NotifyJS.cpp */,
+				5B2505ED1F27336500C0F30C /* NotifyJS.h */,
+			);
+			name = cpp;
+			path = ../../../../../common/cpp;
+			sourceTree = "<group>";
+		};
+		5B2505EE1F27336500C0F30C /* protobuf */ = {
+			isa = PBXGroup;
+			children = (
+				5B2505F31F27336500C0F30C /* socketcc */,
+				5B2505EF1F27336500C0F30C /* PBNetwork.cpp */,
+				5B2505F01F27336500C0F30C /* PBNetwork.h */,
+				5B2505F11F27336500C0F30C /* PBNetworkMessage.cpp */,
+				5B2505F21F27336500C0F30C /* PBNetworkMessage.h */,
+			);
+			path = protobuf;
+			sourceTree = "<group>";
+		};
+		5B2505F31F27336500C0F30C /* socketcc */ = {
+			isa = PBXGroup;
+			children = (
+				5B2505F41F27336500C0F30C /* condition.cpp */,
+				5B2505F51F27336500C0F30C /* ipaddress.cpp */,
+				5B2505F61F27336500C0F30C /* mutualexclusion.cpp */,
+				5B2505F71F27336500C0F30C /* pthreadcc.h */,
+				5B2505F81F27336500C0F30C /* semaphore.cpp */,
+				5B2505F91F27336500C0F30C /* socketbase.cpp */,
+				5B2505FA1F27336500C0F30C /* socketcc.h */,
+				5B2505FB1F27336500C0F30C /* socketexception.cpp */,
+				5B2505FC1F27336500C0F30C /* tcpsockets.cpp */,
+				5B2505FD1F27336500C0F30C /* threadbase.cpp */,
+				5B2505FE1F27336500C0F30C /* threadexception.cpp */,
+				5B2505FF1F27336500C0F30C /* udpsockets.cpp */,
+			);
+			path = socketcc;
+			sourceTree = "<group>";
+		};
+		5B2506181F2733C200C0F30C /* Classes */ = {
+			isa = PBXGroup;
+			children = (
+				5B25061B1F2733C200C0F30C /* scripting */,
+			);
+			name = Classes;
+			path = "../../../../../template/build/jsb-link/frameworks/runtime-src/Classes";
+			sourceTree = "<group>";
+		};
+		5B25061B1F2733C200C0F30C /* scripting */ = {
+			isa = PBXGroup;
+			children = (
+				5B25061C1F2733C200C0F30C /* js-bindings */,
+				5B2506221F2733C200C0F30C /* sy.cpp */,
+				5B2506231F2733C200C0F30C /* sy.h */,
+			);
+			path = scripting;
+			sourceTree = "<group>";
+		};
+		5B25061C1F2733C200C0F30C /* js-bindings */ = {
+			isa = PBXGroup;
+			children = (
+				5B25061D1F2733C200C0F30C /* auto */,
+			);
+			path = "js-bindings";
+			sourceTree = "<group>";
+		};
+		5B25061D1F2733C200C0F30C /* auto */ = {
+			isa = PBXGroup;
+			children = (
+				5B2506201F2733C200C0F30C /* jsb_sy_auto.cpp */,
+				5B2506211F2733C200C0F30C /* jsb_sy_auto.hpp */,
+			);
+			path = auto;
+			sourceTree = "<group>";
+		};
 		A60A9D391C2008DE0070800A /* chipmunk */ = {
 			isa = PBXGroup;
 			children = (
@@ -594,6 +718,8 @@
 			files = (
 				4DFA4C121CBCC49000E3B736 /* jsb_creator_auto.hpp in Headers */,
 				1A119EA318BDF19200352BAA /* jsb_cocos2dx_studio_auto.hpp in Headers */,
+				5B2506101F27336500C0F30C /* socketcc.h in Headers */,
+				5B25062A1F2733C200C0F30C /* sy.h in Headers */,
 				1A119F0118BDF19200352BAA /* ScriptingCore.h in Headers */,
 				1A119EBD18BDF19200352BAA /* cocos2d_specifics.hpp in Headers */,
 				83A5661B18DA878400FC31A0 /* jsb_socketio.h in Headers */,
@@ -607,15 +733,18 @@
 				1A119ED118BDF19200352BAA /* js_bindings_config.h in Headers */,
 				BA127E711D791E21002C5B50 /* js_bindings_chipmunk_functions.h in Headers */,
 				1A119EF918BDF19200352BAA /* jsb_websocket.h in Headers */,
+				5B25060D1F27336500C0F30C /* pthreadcc.h in Headers */,
 				BAFF7DE81D6196D40051B92F /* js_bindings_chipmunk_auto_classes_registration.h in Headers */,
 				1A119E9118BDF19200352BAA /* jsb_cocos2dx_extension_auto.hpp in Headers */,
 				1A119E8B18BDF19200352BAA /* jsb_cocos2dx_builder_auto.hpp in Headers */,
 				1A119E9D18BDF19200352BAA /* jsb_cocos2dx_spine_auto.hpp in Headers */,
 				1A119EEB18BDF19200352BAA /* jsb_opengl_registration.h in Headers */,
 				BA4F59861E28DCD3003F5096 /* jsb_cocos2dx_network_auto.hpp in Headers */,
+				5B2506071F27336500C0F30C /* PBNetwork.h in Headers */,
 				1A119F0318BDF19200352BAA /* spidermonkey_specifics.h in Headers */,
 				1A119EE718BDF19200352BAA /* jsb_opengl_manual.h in Headers */,
 				4D9BB1F91DFAB8B300B58565 /* jsb_box2d_auto.hpp in Headers */,
+				5B2506281F2733C200C0F30C /* jsb_sy_auto.hpp in Headers */,
 				1A119ED518BDF19200352BAA /* js_bindings_core.h in Headers */,
 				1A119EC318BDF19200352BAA /* js_bindings_ccbreader.h in Headers */,
 				1A119EDF18BDF19200352BAA /* jsb_helper.h in Headers */,
@@ -634,6 +763,8 @@
 				1A119ED918BDF19200352BAA /* js_bindings_opengl.h in Headers */,
 				FA6F1BB51D815C2C007DD223 /* jsb_cocos2dx_dragonbones_auto.hpp in Headers */,
 				4D9BB2C31DFE4E2600B58565 /* js_bindings_box2d_manual.h in Headers */,
+				5B2506051F27336500C0F30C /* NotifyJS.h in Headers */,
+				5B2506091F27336500C0F30C /* PBNetworkMessage.h in Headers */,
 				BA4095C41A6F730A005E53F6 /* jsb_cocos2dx_studio_conversions.h in Headers */,
 				1A119EC718BDF19200352BAA /* jsb_cocos2dx_studio_manual.h in Headers */,
 				4DFA4C051CBCBC4E00E3B736 /* js-BindingsExport.h in Headers */,
@@ -779,26 +910,36 @@
 				0541A7501973876100E45470 /* JavaScriptObjCBridge.mm in Sources */,
 				BA4F598B1E28DE4A003F5096 /* js_network_manual.cpp in Sources */,
 				1A119EE918BDF19200352BAA /* jsb_opengl_registration.cpp in Sources */,
+				5B2506081F27336500C0F30C /* PBNetworkMessage.cpp in Sources */,
 				1A119EF718BDF19200352BAA /* jsb_websocket.cpp in Sources */,
 				1A119ED318BDF19200352BAA /* js_bindings_core.cpp in Sources */,
 				1A119EC118BDF19200352BAA /* js_bindings_ccbreader.cpp in Sources */,
 				1A119EFB18BDF19200352BAA /* XMLHTTPRequest.cpp in Sources */,
 				BA127E6F1D791E21002C5B50 /* js_bindings_chipmunk_functions.cpp in Sources */,
+				5B2506041F27336500C0F30C /* NotifyJS.cpp in Sources */,
 				A60A9D4C1C2008F60070800A /* js_bindings_chipmunk_registration.cpp in Sources */,
 				BAFF7DEA1D6196D40051B92F /* js_bindings_chipmunk_auto_classes.cpp in Sources */,
 				1A119EC518BDF19200352BAA /* jsb_cocos2dx_studio_manual.cpp in Sources */,
+				5B2506061F27336500C0F30C /* PBNetwork.cpp in Sources */,
 				FA6F1BB31D815C2C007DD223 /* jsb_cocos2dx_dragonbones_auto.cpp in Sources */,
+				5B2506151F27336500C0F30C /* udpsockets.cpp in Sources */,
 				1A119E8F18BDF19200352BAA /* jsb_cocos2dx_extension_auto.cpp in Sources */,
+				5B2506271F2733C200C0F30C /* jsb_sy_auto.cpp in Sources */,
 				1A119ED718BDF19200352BAA /* js_bindings_opengl.cpp in Sources */,
 				1AB5E62B18D05BC80088DAA4 /* jsb_cocos2dx_ui_auto.cpp in Sources */,
 				1A119E9B18BDF19200352BAA /* jsb_cocos2dx_spine_auto.cpp in Sources */,
+				5B2506131F27336500C0F30C /* threadbase.cpp in Sources */,
 				1A119EF318BDF19200352BAA /* js_bindings_system_registration.cpp in Sources */,
+				5B2506111F27336500C0F30C /* socketexception.cpp in Sources */,
 				1A119EBB18BDF19200352BAA /* cocos2d_specifics.cpp in Sources */,
 				BAF638DC1B5F5DC900CDB43A /* jsb_cocos2dx_audioengine_auto.cpp in Sources */,
 				1A119EE518BDF19200352BAA /* jsb_opengl_manual.cpp in Sources */,
 				1A119F0518BDF19200352BAA /* jsb_cocos2dx_spine_manual.cpp in Sources */,
 				BA4095C21A6F730A005E53F6 /* jsb_cocos2dx_studio_conversions.cpp in Sources */,
 				FA6F1BBA1D816265007DD223 /* jsb_cocos2dx_dragonbones_manual.cpp in Sources */,
+				5B2506291F2733C200C0F30C /* sy.cpp in Sources */,
+				5B25060B1F27336500C0F30C /* ipaddress.cpp in Sources */,
+				5B2506141F27336500C0F30C /* threadexception.cpp in Sources */,
 				4D9BB1F81DFAB8B300B58565 /* jsb_box2d_auto.cpp in Sources */,
 				4D11DCCE1E486C9400DB6838 /* js_bindings_creator_manual.cpp in Sources */,
 				4DFA4C011CBCBC4E00E3B736 /* js_module_register.cpp in Sources */,
@@ -806,8 +947,12 @@
 				4DFA4C101CBCC49000E3B736 /* jsb_creator_auto.cpp in Sources */,
 				A60A9D4A1C2008F60070800A /* js_bindings_chipmunk_manual.cpp in Sources */,
 				4D9BB2C21DFE4E2600B58565 /* js_bindings_box2d_manual.cpp in Sources */,
+				5B25060E1F27336500C0F30C /* semaphore.cpp in Sources */,
+				5B25060A1F27336500C0F30C /* condition.cpp in Sources */,
 				BA9FD5D21BAC0A7600996C85 /* CCComponentJS.cpp in Sources */,
+				5B25060C1F27336500C0F30C /* mutualexclusion.cpp in Sources */,
 				1AB5E63318D05BF30088DAA4 /* jsb_cocos2dx_ui_manual.cpp in Sources */,
+				5B25060F1F27336500C0F30C /* socketbase.cpp in Sources */,
 				1A119EC918BDF19200352BAA /* jsb_cocos2dx_extension_manual.cpp in Sources */,
 				1A119EA118BDF19200352BAA /* jsb_cocos2dx_studio_auto.cpp in Sources */,
 				1A119EDB18BDF19200352BAA /* js_manual_conversions.cpp in Sources */,
@@ -815,6 +960,7 @@
 				83A5661918DA878400FC31A0 /* jsb_socketio.cpp in Sources */,
 				1A119EE118BDF19200352BAA /* jsb_opengl_functions.cpp in Sources */,
 				1A119EFF18BDF19200352BAA /* ScriptingCore.cpp in Sources */,
+				5B2506121F27336500C0F30C /* tcpsockets.cpp in Sources */,
 				1A1D3B7818C44FD000922D3C /* jsb_event_dispatcher_manual.cpp in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -983,7 +1129,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/../../../../external/mac/libs",
 				);
-				USER_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/../../../../external/mac/include $(SRCROOT)/../../../../external/sources $(SRCROOT)/../../../../cocos/platform/mac $(SRCROOT)/../../../../external/mac/include/spidermonkey";
+				USER_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/../../../../external/mac/include $(SRCROOT)/../../../../external/sources $(SRCROOT)/../../../../cocos/platform/mac $(SRCROOT)/../../../../external/mac/include/spidermonkey $(SRCROOT)/../../../../../common $(SRCROOT)/../../../../../template/build/jsb-link/frameworks/runtime-src/Classes";
 			};
 			name = Debug;
 		};
@@ -1003,7 +1149,7 @@
 					"$(inherited)",
 					"$(SRCROOT)/../../../../external/mac/libs",
 				);
-				USER_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/../../../../external/mac/include $(SRCROOT)/../../../../external/sources $(SRCROOT)/../../../../cocos/platform/mac $(SRCROOT)/../../../../external/mac/include/spidermonkey";
+				USER_HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/../../../../external/mac/include $(SRCROOT)/../../../../external/sources $(SRCROOT)/../../../../cocos/platform/mac $(SRCROOT)/../../../../external/mac/include/spidermonkey $(SRCROOT)/../../../../../common $(SRCROOT)/../../../../../template/build/jsb-link/frameworks/runtime-src/Classes";
 			};
 			name = Release;
 		};

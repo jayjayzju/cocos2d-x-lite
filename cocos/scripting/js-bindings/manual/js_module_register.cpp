@@ -43,6 +43,10 @@
 #include "scripting/js-bindings/manual/platform/ios/JavaScriptObjCBridge.h"
 #endif
 
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
+#include "scripting/js-bindings/auto/jsb_sy_auto.hpp"
+#endif
+
 USING_NS_CC;
 int js_module_register()
 {
@@ -114,6 +118,11 @@ int js_module_register()
 #elif (CC_TARGET_PLATFORM == CC_PLATFORM_IOS || CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
     sc->addRegisterCallback(JavaScriptObjCBridge::_js_register);
 #endif
+    
+#if (CC_TARGET_PLATFORM == CC_PLATFORM_MAC)
+    sc->addRegisterCallback(register_all_sy);
+#endif
+    
     return 1;
 }
 
