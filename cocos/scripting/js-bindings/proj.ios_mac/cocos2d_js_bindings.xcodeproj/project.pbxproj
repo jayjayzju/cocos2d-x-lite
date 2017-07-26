@@ -167,6 +167,8 @@
 		5B2506281F2733C200C0F30C /* jsb_sy_auto.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 5B2506211F2733C200C0F30C /* jsb_sy_auto.hpp */; };
 		5B2506291F2733C200C0F30C /* sy.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5B2506221F2733C200C0F30C /* sy.cpp */; };
 		5B25062A1F2733C200C0F30C /* sy.h in Headers */ = {isa = PBXBuildFile; fileRef = 5B2506231F2733C200C0F30C /* sy.h */; };
+		5BA0EA9F1F284615009E9614 /* YunCengHelper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5BA0EA9D1F284615009E9614 /* YunCengHelper.cpp */; };
+		5BA0EAA01F284615009E9614 /* YunCengHelper.h in Headers */ = {isa = PBXBuildFile; fileRef = 5BA0EA9E1F284615009E9614 /* YunCengHelper.h */; };
 		83A5661918DA878400FC31A0 /* jsb_socketio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83A5661718DA878400FC31A0 /* jsb_socketio.cpp */; };
 		83A5661A18DA878400FC31A0 /* jsb_socketio.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 83A5661718DA878400FC31A0 /* jsb_socketio.cpp */; };
 		83A5661B18DA878400FC31A0 /* jsb_socketio.h in Headers */ = {isa = PBXBuildFile; fileRef = 83A5661818DA878400FC31A0 /* jsb_socketio.h */; };
@@ -321,6 +323,8 @@
 		5B2506211F2733C200C0F30C /* jsb_sy_auto.hpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.h; path = jsb_sy_auto.hpp; sourceTree = "<group>"; };
 		5B2506221F2733C200C0F30C /* sy.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = sy.cpp; sourceTree = "<group>"; };
 		5B2506231F2733C200C0F30C /* sy.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = sy.h; sourceTree = "<group>"; };
+		5BA0EA9D1F284615009E9614 /* YunCengHelper.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = YunCengHelper.cpp; sourceTree = "<group>"; };
+		5BA0EA9E1F284615009E9614 /* YunCengHelper.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = YunCengHelper.h; sourceTree = "<group>"; };
 		83A5661718DA878400FC31A0 /* jsb_socketio.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = jsb_socketio.cpp; sourceTree = "<group>"; };
 		83A5661818DA878400FC31A0 /* jsb_socketio.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = jsb_socketio.h; sourceTree = "<group>"; };
 		A60A9D401C2008F60070800A /* js_bindings_chipmunk_manual.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; name = js_bindings_chipmunk_manual.cpp; path = chipmunk/js_bindings_chipmunk_manual.cpp; sourceTree = "<group>"; };
@@ -606,6 +610,7 @@
 			isa = PBXGroup;
 			children = (
 				5B2505EE1F27336500C0F30C /* protobuf */,
+				5BA0EA9C1F284615009E9614 /* yunceng */,
 				5B2505EC1F27336500C0F30C /* NotifyJS.cpp */,
 				5B2505ED1F27336500C0F30C /* NotifyJS.h */,
 			);
@@ -678,6 +683,15 @@
 				5B2506211F2733C200C0F30C /* jsb_sy_auto.hpp */,
 			);
 			path = auto;
+			sourceTree = "<group>";
+		};
+		5BA0EA9C1F284615009E9614 /* yunceng */ = {
+			isa = PBXGroup;
+			children = (
+				5BA0EA9E1F284615009E9614 /* YunCengHelper.h */,
+				5BA0EA9D1F284615009E9614 /* YunCengHelper.cpp */,
+			);
+			path = yunceng;
 			sourceTree = "<group>";
 		};
 		A60A9D391C2008DE0070800A /* chipmunk */ = {
@@ -774,6 +788,7 @@
 				1A119E8518BDF19200352BAA /* jsb_cocos2dx_auto.hpp in Headers */,
 				1A119F0718BDF19200352BAA /* jsb_cocos2dx_spine_manual.h in Headers */,
 				A60A9D4D1C2008F60070800A /* js_bindings_chipmunk_registration.h in Headers */,
+				5BA0EAA01F284615009E9614 /* YunCengHelper.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -936,6 +951,7 @@
 				1A119EE518BDF19200352BAA /* jsb_opengl_manual.cpp in Sources */,
 				1A119F0518BDF19200352BAA /* jsb_cocos2dx_spine_manual.cpp in Sources */,
 				BA4095C21A6F730A005E53F6 /* jsb_cocos2dx_studio_conversions.cpp in Sources */,
+				5BA0EA9F1F284615009E9614 /* YunCengHelper.cpp in Sources */,
 				FA6F1BBA1D816265007DD223 /* jsb_cocos2dx_dragonbones_manual.cpp in Sources */,
 				5B2506291F2733C200C0F30C /* sy.cpp in Sources */,
 				5B25060B1F27336500C0F30C /* ipaddress.cpp in Sources */,
