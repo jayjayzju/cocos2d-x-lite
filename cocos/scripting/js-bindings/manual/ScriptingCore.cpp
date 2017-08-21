@@ -946,23 +946,24 @@ void ScriptingCore::reportError(JSContext *cx, const char *message, JSErrorRepor
         __android_log_print(ANDROID_LOG_ERROR, "cocos js error:", "%s line:%u msg:%s",
                             fileName.c_str(), report->lineno, msg.c_str());
 #else
-        cocos2d::log("%s:%u:%s\n", fileName.c_str(), report->lineno, msg.c_str());
+        cocos2d::log("%s:%u:%u:%s\n", fileName.c_str(), report->lineno, report->column, msg.c_str());
 #endif
         // Should clear pending exception, otherwise it will trigger infinite loop
         if (JS_IsExceptionPending(cx)) {
             JS_ClearPendingException(cx);
         }
 
-        JS::Value dataVal[3] = {
+        JS::Value dataVal[4] = {
             std_string_to_jsval(cx, fileName),
             int32_to_jsval(cx, lineno),
+            int32_to_jsval(cx, report->column),
             std_string_to_jsval(cx, msg)
         };
 
         auto sc = ScriptingCore::getInstance();
         JS::RootedValue rval(cx);
         JS::RootedValue global(cx, OBJECT_TO_JSVAL(sc->getGlobalObject()));
-        sc->executeFunctionWithOwner(global, "__errorHandler", 3, dataVal, &rval);
+        sc->executeFunctionWithOwner(global, "__errorHandler", 4, dataVal, &rval);
     }
 };
 
