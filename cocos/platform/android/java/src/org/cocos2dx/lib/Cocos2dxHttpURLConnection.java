@@ -49,8 +49,10 @@ import java.util.Map.Entry;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.InflaterInputStream;
 
+import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
 import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManagerFactory;
 
 public class Cocos2dxHttpURLConnection
@@ -67,12 +69,34 @@ public class Cocos2dxHttpURLConnection
             //Accept-Encoding
             urlConnection.setRequestProperty("Accept-Encoding", "identity");
             urlConnection.setDoInput(true);
+
+            // add by wangtianhao
+            trustAllHostname(urlConnection);
         } catch (Exception e) {
             Log.e("URLConnection exception", e.toString());
             return null;
         }
 
         return urlConnection;
+    }
+
+    // add by wangtianhao
+    static void trustAllHostname(HttpURLConnection urlConnection)
+    {
+        try
+        {
+            HttpsURLConnection httpsURLConnection = (HttpsURLConnection)urlConnection;
+            httpsURLConnection.setHostnameVerifier(new HostnameVerifier() {
+                @Override
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            });
+        }
+        catch (Exception e)
+        {
+
+        }
     }
 
     static void setReadAndConnectTimeout(HttpURLConnection urlConnection, int readMiliseconds, int connectMiliseconds) {
