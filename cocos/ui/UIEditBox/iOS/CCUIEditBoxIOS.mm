@@ -402,7 +402,11 @@
     int maxLength = getEditBoxImplIOS()->getMaxLength();
     if (textField.markedTextRange == nil) {
         if (textField.text.length > maxLength) {
-            textField.text = [textField.text substringToIndex:maxLength];
+            NSRange range = [textField.text rangeOfComposedCharacterSequenceAtIndex:maxLength];
+            if (range.length + range.location > maxLength)
+                textField.text = [textField.text substringToIndex:range.location];
+            else
+                textField.text = [textField.text substringToIndex:maxLength];
         }
         
         const char* inputText = [textField.text UTF8String];
@@ -461,8 +465,12 @@
     NSUInteger rangeLength = range.length;
 
     NSUInteger newLength = oldLength - rangeLength + replacementLength;
-
-    return newLength <= maxLength;
+    
+    if (nil == textField.markedTextRange
+        && textField.text.length == maxLength
+        && newLength > textField.text.length)
+        return NO;
+    return YES;
 }
 
 @end
