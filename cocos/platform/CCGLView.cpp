@@ -126,7 +126,18 @@ void GLView::updateDesignResolutionSize()
 
         if (_resolutionPolicy == ResolutionPolicy::NO_BORDER)
         {
-            _scaleX = _scaleY = MAX(_scaleX, _scaleY);
+            if (_screenSize.width * 9 - _screenSize.height * 16 > 0)
+            {
+                // 比16:9更宽 -- iPhone X
+                _scaleX = _scaleY;
+                _designResolutionSize.width = ceilf(_screenSize.width/_scaleX);
+            }
+            else
+            {
+                // 比16:9更窄 -- iPad
+                _scaleY = _scaleX;
+                _designResolutionSize.height = ceilf(_screenSize.height/_scaleY);
+            }
         }
 
         else if (_resolutionPolicy == ResolutionPolicy::SHOW_ALL)
@@ -165,6 +176,26 @@ void GLView::setDesignResolutionSize(float width, float height, ResolutionPolicy
     if (width == 0.0f || height == 0.0f)
     {
         return;
+    }
+    
+    if (resolutionPolicy == ResolutionPolicy::NO_BORDER)
+    {
+        if (height >= 1080)
+        {
+            // 高分辨率
+            // 背景图尺寸 2340 x 1440
+            // UI设计尺寸 1920 x 1080
+            width = 1920;
+            height = 1080;
+        }
+        else
+        {
+            // 低分辨率
+            // 背景图尺寸 1386 x 852
+            // UI设计尺寸 1136 x 640
+            width = 1136;
+            height = 640;
+        }
     }
 
     _designResolutionSize.setSize(width, height);
