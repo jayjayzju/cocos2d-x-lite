@@ -145,6 +145,14 @@ Copyright (C) 2008 Apple Inc. All Rights Reserved.
 
 
         originalRect_ = self.frame;
+        if (self.frame.size.width == 812 && self.frame.size.height == 375)
+        {
+            // 针对iPhone X留出safe area
+            originalRect_.size.width = 812 - 34 * 2;
+            originalRect_.size.height = 354;
+            originalRect_.origin.x = 34;
+            originalRect_.origin.y = 0;
+        }
         self.keyboardShowNotification = nil;
 
         if ([self respondsToSelector:@selector(setContentScaleFactor:)])
