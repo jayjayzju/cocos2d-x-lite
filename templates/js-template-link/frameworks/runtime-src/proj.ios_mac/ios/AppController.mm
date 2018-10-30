@@ -1,6 +1,7 @@
 /****************************************************************************
  Copyright (c) 2010-2013 cocos2d-x.org
- Copyright (c) 2013-2017 Chukong Technologies Inc.
+ Copyright (c) 2013-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos2d-x.org
 
@@ -29,35 +30,34 @@
 #import "RootViewController.h"
 #import "platform/ios/CCEAGLView-ios.h"
 
+#import "cocos-analytics/CAAgent.h"
+
 using namespace cocos2d;
 
 @implementation AppController
 
+Application* app = nullptr;
 @synthesize window;
 
 #pragma mark -
 #pragma mark Application lifecycle
 
-// cocos2d application instance
-static AppDelegate s_sharedApplication;
-
 - (BOOL)application:(UIApplication *)application didFinishLaunchingWithOptions:(NSDictionary *)launchOptions {
 
-    cocos2d::Application *app = cocos2d::Application::getInstance();
-
-    // Initialize the GLView attributes
-    app->initGLContextAttrs();
-    cocos2d::GLViewImpl::convertAttrs();
-
-    // Override point for customization after application launch.
+    [CAAgent enableDebug:NO];
 
     // Add the view controller's view to the window and display.
-    window = [[UIWindow alloc] initWithFrame: [[UIScreen mainScreen] bounds]];
+    float scale = [[UIScreen mainScreen] scale];
+    CGRect bounds = [[UIScreen mainScreen] bounds];
+    window = [[UIWindow alloc] initWithFrame: bounds];
+
+    // cocos2d application instance
+    app = new AppDelegate(bounds.size.width * scale, bounds.size.height * scale);
+    app->setMultitouch(true);
 
     // Use RootViewController to manage CCEAGLView
     _viewController = [[RootViewController alloc]init];
     _viewController.wantsFullScreenLayout = YES;
-
 
     // Set RootViewController to window
     if ( [[UIDevice currentDevice].systemVersion floatValue] < 6.0)
@@ -75,13 +75,9 @@ static AppDelegate s_sharedApplication;
 
     [[UIApplication sharedApplication] setStatusBarHidden:YES];
 
-    // IMPORTANT: Setting the GLView should be done after creating the RootViewController
-    cocos2d::GLView *glview = cocos2d::GLViewImpl::createWithEAGLView((__bridge void *)_viewController.view);
-    cocos2d::Director::getInstance()->setOpenGLView(glview);
-
     //run the cocos2d-x game scene
-    app->run();
-
+    app->start();
+    
     return YES;
 }
 
@@ -91,16 +87,12 @@ static AppDelegate s_sharedApplication;
       Sent when the application is about to move from active to inactive state. This can occur for certain types of temporary interruptions (such as an incoming phone call or SMS message) or when the user quits the application and it begins the transition to the background state.
       Use this method to pause ongoing tasks, disable timers, and throttle down OpenGL ES frame rates. Games should use this method to pause the game.
     */
-    // We don't need to call this method any more. It will interrupt user defined game pause&resume logic
-    /* cocos2d::Director::getInstance()->pause(); */
 }
 
 - (void)applicationDidBecomeActive:(UIApplication *)application {
     /*
       Restart any tasks that were paused (or not yet started) while the application was inactive. If the application was previously in the background, optionally refresh the user interface.
     */
-    // We don't need to call this method any more. It will interrupt user defined game pause&resume logic
-    /* cocos2d::Director::getInstance()->resume(); */
 }
 
 - (void)applicationDidEnterBackground:(UIApplication *)application {
@@ -108,25 +100,28 @@ static AppDelegate s_sharedApplication;
       Use this method to release shared resources, save user data, invalidate timers, and store enough application state information to restore your application to its current state in case it is terminated later.
       If your application supports background execution, called instead of applicationWillTerminate: when the user quits.
     */
-    cocos2d::Application::getInstance()->applicationDidEnterBackground();
+    app->applicationDidEnterBackground();
+    if (CAAgent.isInited)
+        [CAAgent onPause];
 }
 
 - (void)applicationWillEnterForeground:(UIApplication *)application {
     /*
       Called as part of  transition from the background to the inactive state: here you can undo many of the changes made on entering the background.
     */
-    auto glview = (__bridge CCEAGLView*)(Director::getInstance()->getOpenGLView()->getEAGLView());
-    auto currentView = [[[[UIApplication sharedApplication] keyWindow] subviews] lastObject];
-    if (glview == currentView) {
-        cocos2d::Application::getInstance()->applicationWillEnterForeground();
-    }
+    app->applicationWillEnterForeground();
+    if (CAAgent.isInited)
+        [CAAgent onResume];
 }
 
-- (void)applicationWillTerminate:(UIApplication *)application {
-    /*
-      Called when the application is about to terminate.
-      See also applicationDidEnterBackground:.
-    */
+- (void)applicationWillTerminate:(UIApplication *)application
+{
+    
+    delete app;
+    app = nil;
+
+    if (CAAgent.isInited)
+        [CAAgent onDestroy];
 }
 
 
@@ -138,16 +133,5 @@ static AppDelegate s_sharedApplication;
       Free up as much memory as possible by purging cached data objects that can be recreated (or reloaded from disk) later.
     */
 }
-
-
-#if __has_feature(objc_arc)
-#else
-- (void)dealloc {
-    [window release];
-    [_viewController release];
-    [super dealloc];
-}
-#endif
-
 
 @end

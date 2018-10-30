@@ -1,6 +1,7 @@
 /****************************************************************************
  Copyright (c) 2015 Chris Hannon http://www.channon.us
- Copyright (c) 2013-2017 Chukong Technologies Inc.
+ Copyright (c) 2013-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos2d-x.org
 
@@ -33,8 +34,8 @@
 #include <sstream>
 #include <iterator>
 #include "base/ccUTF8.h"
-#include "base/CCDirector.h"
-#include "base/CCScheduler.h"
+#include "base/ccMacros.h"
+#include "platform/CCApplication.h"
 #include "network/WebSocket.h"
 #include "network/HttpClient.h"
 
@@ -403,10 +404,9 @@ SIOClientImpl::SIOClientImpl(const Uri& uri, const std::string& caFilePath) :
 
 SIOClientImpl::~SIOClientImpl()
 {
-    if (_connected)
-        disconnect();
+    assert(!_connected);
 
-    CC_SAFE_DELETE(_ws);
+    CC_SAFE_RELEASE(_ws);
 }
 
 void SIOClientImpl::handshake()
@@ -466,6 +466,7 @@ void SIOClientImpl::handshakeResponse(HttpClient* /*sender*/, HttpResponse *resp
             client.second->getDelegate()->onError(client.second, response->getErrorBuffer());
         }
 
+        onClose(nullptr);
         return;
     }
 
@@ -486,12 +487,12 @@ void SIOClientImpl::handshakeResponse(HttpClient* /*sender*/, HttpResponse *resp
     std::string sid = "";
     int heartbeat = 0, timeout = 0;
 
-    if (res.at(res.size() - 1) == '}') {
+    if (res.find('}') != std::string::npos) {
 
         CCLOGINFO("SIOClientImpl::handshake() Socket.IO 1.x detected");
         _version = SocketIOPacket::SocketIOVersion::V10x;
         // sample: 97:0{"sid":"GMkL6lzCmgMvMs9bAAAA","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":60000}
-
+        //         96:0{"sid":"jzrjDlQusSUxLTd3AAAV","upgrades":["websocket"],"pingInterval":25000,"pingTimeout":5000}2:40
         std::string::size_type a, b;
         a = res.find('{');
         std::string temp = res.substr(a, res.size() - a);
@@ -588,7 +589,7 @@ void SIOClientImpl::openSocket()
     _ws = new (std::nothrow) WebSocket();
     if (!_ws->init(*this, s.str(), nullptr, _caFilePath))
     {
-        CC_SAFE_DELETE(_ws);
+        CC_SAFE_RELEASE_NULL(_ws);
     }
 
     return;
@@ -620,14 +621,14 @@ void SIOClientImpl::disconnect()
         _ws->send(s);
     }
 
-    Director::getInstance()->getScheduler()->unscheduleAllForTarget(this);
+    Application::getInstance()->getScheduler()->unscheduleAllForTarget(this);
 
     _connected = false;
 
     SocketIO::getInstance()->removeSocket(_uri.getAuthority());
 
     // Close websocket connection should be at last.
-    _ws->close();
+    _ws->closeAsync();
 }
 
 SIOClientImpl* SIOClientImpl::create(const Uri& uri, const std::string& caFilePath)
@@ -657,13 +658,14 @@ void SIOClientImpl::connectToEndpoint(const std::string& endpoint)
     SocketIOPacket *packet = SocketIOPacket::createPacketWithType("connect", _version);
     packet->setEndpoint(endpoint);
     this->send(packet);
+    delete packet;
 }
 
 void SIOClientImpl::disconnectFromEndpoint(const std::string& endpoint)
 {
-    _clients.erase(endpoint);
+    size_t clientCount = _clients.size();
 
-    if (_clients.empty() || endpoint == "/")
+    if (clientCount == 1 || endpoint == "/")
     {
         CCLOGINFO("SIOClientImpl::disconnectFromEndpoint out of endpoints, checking for disconnect");
 
@@ -677,6 +679,7 @@ void SIOClientImpl::disconnectFromEndpoint(const std::string& endpoint)
         std::string s = "0::" + path;
 
         _ws->send(s);
+        _clients.erase(endpoint);
     }
 }
 
@@ -685,6 +688,7 @@ void SIOClientImpl::heartbeat(float /*dt*/)
     SocketIOPacket *packet = SocketIOPacket::createPacketWithType("heartbeat", _version);
 
     this->send(packet);
+    delete packet;
 
     CCLOGINFO("Heartbeat sent");
 }
@@ -699,6 +703,7 @@ void SIOClientImpl::send(const std::string& endpoint, const std::string& s)
             packet->setEndpoint(endpoint);
             packet->addData(s);
             this->send(packet);
+            delete packet;
             break;
         }
     case SocketIOPacket::SocketIOVersion::V10x:
@@ -729,6 +734,7 @@ void SIOClientImpl::emit(const std::string& endpoint, const std::string& eventna
     packet->setEvent(eventname);
     packet->addData(args);
     this->send(packet);
+    delete packet;
 }
 
 void SIOClientImpl::onOpen(WebSocket* /*ws*/)
@@ -743,7 +749,7 @@ void SIOClientImpl::onOpen(WebSocket* /*ws*/)
         _ws->send(s.data());
     }
 
-    Director::getInstance()->getScheduler()->schedule(CC_SCHEDULE_SELECTOR(SIOClientImpl::heartbeat), this, (_heartbeat * .9f), false);
+    Application::getInstance()->getScheduler()->schedule(CC_CALLBACK_1(SIOClientImpl::heartbeat, this), this, (_heartbeat * .9f), false, "heartbeat");
 
     for (auto& client : _clients)
     {
@@ -808,7 +814,9 @@ void SIOClientImpl::onMessage(WebSocket* /*ws*/, const WebSocket::Data& data)
             case 0:
                 CCLOGINFO("Received Disconnect Signal for Endpoint: %s\n", endpoint.c_str());
                 disconnectFromEndpoint(endpoint);
-                c->fireEvent("disconnect", payload);
+                if (c) {
+                    c->fireEvent("disconnect", payload);
+                }
                 break;
             case 1:
                 CCLOGINFO("Connected to endpoint: %s \n", endpoint.c_str());
@@ -994,10 +1002,11 @@ void SIOClientImpl::onClose(WebSocket* /*ws*/)
         }
         // discard this client
         _connected = false;
-        if (Director::getInstance())
-            Director::getInstance()->getScheduler()->unscheduleAllForTarget(this);
+        if (Application::getInstance())
+            Application::getInstance()->getScheduler()->unscheduleAllForTarget(this);
         
         SocketIO::getInstance()->removeSocket(_uri.getAuthority());
+        _clients.clear();
     }
 
     this->release();
@@ -1015,15 +1024,13 @@ SIOClient::SIOClient(const std::string& path, SIOClientImpl* impl, SocketIO::SIO
     , _socket(impl)
     , _delegate(&delegate)
 {
-
+    static uint32_t instanceIdCounter = 0;
+    _instanceId = instanceIdCounter++;
 }
 
 SIOClient::~SIOClient()
 {
-    if (_connected)
-    {
-        _socket->disconnectFromEndpoint(_path);
-    }
+    assert(!_connected);
 }
 
 void SIOClient::onOpen()
@@ -1067,11 +1074,11 @@ void SIOClient::emit(const std::string& eventname, const std::string& args)
 
 void SIOClient::disconnect()
 {
-    _connected = false;
-
-    _socket->disconnectFromEndpoint(_path);
-
-    this->release();
+    if (_connected)
+    {
+        _connected = false;
+        _socket->disconnectFromEndpoint(_path);
+    }
 }
 
 void SIOClient::socketClosed()
@@ -1111,6 +1118,11 @@ void SIOClient::setTag(const char* tag)
     _tag = tag;
 }
 
+uint32_t SIOClient::getInstanceId() const
+{
+    return _instanceId;
+}
+
 //begin SocketIO methods
 SocketIO *SocketIO::_inst = nullptr;
 
@@ -1135,17 +1147,17 @@ void SocketIO::destroyInstance()
     CC_SAFE_DELETE(_inst);
 }
 
-SIOClient* SocketIO::connect(SocketIO::SIODelegate& delegate, const std::string& uri)
+SIOClient* SocketIO::connect(SIODelegate& delegate, const std::string& uri)
 {
     return SocketIO::connect(uri, delegate);
 }
 
-SIOClient* SocketIO::connect(const std::string& uri, SocketIO::SIODelegate& delegate)
+SIOClient* SocketIO::connect(const std::string& uri, SIODelegate& delegate)
 {
     return SocketIO::connect(uri, delegate, "");
 }
 
-SIOClient* SocketIO::connect(const std::string& uri, SocketIO::SIODelegate& delegate, const std::string& caFilePath)
+SIOClient* SocketIO::connect(const std::string& uri, SIODelegate& delegate, const std::string& caFilePath)
 {
     Uri uriObj = Uri::parse(uri);
 
@@ -1172,7 +1184,7 @@ SIOClient* SocketIO::connect(const std::string& uri, SocketIO::SIODelegate& dele
         //check if already connected to endpoint, handle
         c = socket->getClient(path);
 
-        if(c == nullptr)
+        if (c == nullptr)
         {
             c = new (std::nothrow) SIOClient(path, socket, delegate);
 

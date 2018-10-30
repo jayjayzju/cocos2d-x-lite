@@ -1,6 +1,7 @@
 /****************************************************************************
  Copyright (c) 2015 Chris Hannon http://www.channon.us
- Copyright (c) 2013-2017 Chukong Technologies Inc.
+ Copyright (c) 2013-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
  Permission is hereby granted, free of charge, to any person obtaining a copy
  of this software and associated documentation files (the "Software"), to deal
@@ -55,13 +56,12 @@ in the onClose method the pointer should be set to NULL or used to connect to a 
     client->disconnect();
 
  ****************************************************************************/
-
-#ifndef __CC_SOCKETIO_H__
-#define __CC_SOCKETIO_H__
+#pragma once
 
 #include <string>
 #include <unordered_map>
-#include "platform/CCPlatformMacros.h"
+#include <functional>
+#include "base/ccMacros.h"
 #include "base/CCMap.h"
 
 
@@ -153,7 +153,7 @@ public:
      *  @param  delegate the delegate which want to receive events from the socket.io client.
      *  @return SIOClient* an initialized SIOClient if connected successfully, otherwise nullptr.
      */
-    static SIOClient* connect(const std::string& uri, SocketIO::SIODelegate& delegate);
+    static SIOClient* connect(const std::string& uri, SIODelegate& delegate);
 
     /**
      *  Static client creation method, similar to socketio.connect(uri) in JS.
@@ -162,7 +162,7 @@ public:
      *  @param caFilePath The ca file path for wss connection
      *  @return SIOClient* an initialized SIOClient if connected successfully, otherwise nullptr.
      */
-    static SIOClient* connect(const std::string& uri, SocketIO::SIODelegate& delegate, const std::string& caFilePath);
+    static SIOClient* connect(const std::string& uri, SIODelegate& delegate, const std::string& caFilePath);
 
     /**
      *  Static client creation method, similar to socketio.connect(uri) in JS.
@@ -170,7 +170,7 @@ public:
      *  @param  uri      the URI of the socket.io server.
      *  @return SIOClient* an initialized SIOClient if connected successfully, otherwise nullptr.
      */
-    CC_DEPRECATED_ATTRIBUTE  static SIOClient* connect(SocketIO::SIODelegate& delegate, const std::string& uri);
+    CC_DEPRECATED_ATTRIBUTE  static SIOClient* connect(SIODelegate& delegate, const std::string& uri);
 
 private:
 
@@ -213,6 +213,7 @@ private:
     SocketIO::SIODelegate* _delegate;
 
     EventRegistry _eventRegistry;
+    uint32_t _instanceId;
 
     void fireEvent(const std::string& eventName, const std::string& data);
 
@@ -284,6 +285,11 @@ public:
         return _tag.c_str();
     }
 
+    /**
+     * Gets instance id
+     */
+    uint32_t getInstanceId() const;
+
 };
 
 }
@@ -292,6 +298,3 @@ NS_CC_END
 
 // end group
 /// @}
-
-#endif /* defined(__CC_JSB_SOCKETIO_H__) */
-

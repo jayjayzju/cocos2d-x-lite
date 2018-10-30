@@ -1,6 +1,7 @@
 /****************************************************************************
  Copyright (c) 2010-2012 cocos2d-x.org
  Copyright (c) 2013-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos2d-x.org
 
@@ -24,7 +25,6 @@
  ****************************************************************************/
 
 #include "base/CCData.h"
-#include "base/CCConsole.h"
 
 NS_CC_BEGIN
 
@@ -113,6 +113,7 @@ void Data::copy(const unsigned char* bytes, const ssize_t size)
 
 void Data::fastSet(unsigned char* bytes, const ssize_t size)
 {
+    clear();
     _bytes = bytes;
     _size = size;
 }

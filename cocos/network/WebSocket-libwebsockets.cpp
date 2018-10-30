@@ -1,6 +1,7 @@
 /****************************************************************************
  Copyright (c) 2010-2012 cocos2d-x.org
- Copyright (c) 2013-2017 Chukong Technologies Inc.
+ Copyright (c) 2013-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos2d-x.org
 
@@ -26,16 +27,7 @@
 (http://libwebsockets.org)"
 
  ****************************************************************************/
-
-#include "network/WebSocket.h"
-#include "network/Uri.h"
-#include "base/CCDirector.h"
-#include "base/CCScheduler.h"
-#include "base/CCEventDispatcher.h"
-#include "base/CCEventListenerCustom.h"
-#include "platform/CCFileUtils.h"
-#include "platform/CCStdC.h"
-
+#include "websockets/libwebsockets.h"
 #include <string>
 #include <vector>
 #include <mutex>
@@ -48,8 +40,12 @@
 #include <list>
 #include <signal.h>
 #include <errno.h>
-
-#include "websockets/libwebsockets.h"
+#include "network/WebSocket.h"
+#include "network/Uri.h"
+#include "base/CCScheduler.h"
+#include "platform/CCFileUtils.h"
+#include "platform/CCStdC.h"
+#include "platform/CCApplication.h"
 
 #define NS_NETWORK_BEGIN namespace cocos2d { namespace network {
 #define NS_NETWORK_END }}
@@ -67,7 +63,7 @@ struct lws_vhost;
 // log, CCLOG aren't threadsafe, since we uses sub threads for parsing pcm data, threadsafe log output
 // is needed. Define the following macros (ALOGV, ALOGD, ALOGI, ALOGW, ALOGE) for threadsafe log output.
 
-//FIXME: Move _winLog, winLog to a separated file
+//IDEA: Move _winLog, winLog to a separated file
 static void _winLog(const char *format, va_list args)
 {
     static const int MAX_LOG_LENGTH = 16 * 1024;
@@ -204,7 +200,7 @@ public:
 private:
     // The following callback functions are invoked in websocket thread
     void onClientOpenConnectionRequest();
-    int onSocketCallback(struct lws *wsi, int reason, void *in, ssize_t len);
+    int onSocketCallback(struct lws *wsi, enum lws_callback_reasons reason, void* in, ssize_t len);
 
     int onClientWritable();
     int onClientReceivedData(void* in, ssize_t len);
@@ -242,8 +238,6 @@ private:
     CloseState _closeState;
 
     std::string _caFilePath;
-
-    cocos2d::EventListenerCustom* _resetDirectorListener;
 
     friend class WsThreadHelper;
     friend class WebSocketCallbackWrapper;
@@ -292,7 +286,7 @@ static lws_context_creation_info convertToContextCreationInfo(const struct lws_p
     info.port = CONTEXT_PORT_NO_LISTEN;
     info.protocols = protocols;
 
-    // FIXME: Disable 'permessage-deflate' extension temporarily because of issues:
+    // IDEA: Disable 'permessage-deflate' extension temporarily because of issues:
     // https://github.com/cocos2d/cocos2d-x/issues/16045, https://github.com/cocos2d/cocos2d-x/issues/15767
     // libwebsockets issue: https://github.com/warmcat/libwebsockets/issues/593
     // Currently, we couldn't find out the exact reason.
@@ -372,7 +366,7 @@ private:
 class WebSocketCallbackWrapper {
 public:
 
-    static int onSocketCallback(struct lws *wsi, enum lws_callback_reasons reason, void *user, void *in, size_t len)
+    static int onSocketCallback(struct lws *wsi, enum lws_callback_reasons reason, void* user, void* in, size_t len)
     {
         // Gets the user data from context. We know that it's a 'WebSocket' instance.
         if (wsi == nullptr) {
@@ -438,7 +432,7 @@ void WsThreadHelper::onSubThreadLoop()
             {
                 auto msg = (*iter);
                 auto ws = (WebSocketImpl*)msg->user;
-                // TODO: ws may be a invalid pointer
+                // REFINE: ws may be a invalid pointer
                 if (msg->what == WS_MSG_TO_SUBTHREAD_CREATE_CONNECTION)
                 {
                     ws->onClientOpenConnectionRequest();
@@ -507,7 +501,7 @@ void WsThreadHelper::wsThreadEntryFunc()
 
 void WsThreadHelper::sendMessageToCocosThread(const std::function<void()>& cb)
 {
-    cocos2d::Director::getInstance()->getScheduler()->performFunctionInCocosThread(cb);
+    cocos2d::Application::getInstance()->getScheduler()->performFunctionInCocosThread(cb);
 }
 
 void WsThreadHelper::sendMessageToWebSocketThread(WsMessage *msg)
@@ -613,13 +607,18 @@ WebSocketImpl::WebSocketImpl(cocos2d::network::WebSocket* ws)
     }
 
     __websocketInstances->push_back(this);
-    
-    std::shared_ptr<std::atomic<bool>> isDestroyed = _isDestroyed;
-    _resetDirectorListener = cocos2d::Director::getInstance()->getEventDispatcher()->addCustomEventListener(cocos2d::Director::EVENT_RESET, [this, isDestroyed](cocos2d::EventCustom*){
-        if (*isDestroyed)
-            return;
-        close();
-    });
+
+// NOTE: !!! Be careful while merging cocos2d-x-lite back to cocos2d-x. !!!
+// 'close' is a synchronous operation which may wait some seconds to make sure connection is closed.
+// But JSB doesn't need to listen on EVENT_RESET event to close connection,
+// since finalize callback (refer to 'WebSocket_finalize' function in jsb_websocket.cpp) will invoke 'closeAsync'.
+//
+//    std::shared_ptr<std::atomic<bool>> isDestroyed = _isDestroyed;
+//    _resetDirectorListener = cocos2d::Director::getInstance()->getEventDispatcher()->addCustomEventListener(cocos2d::Director::EVENT_RESET, [this, isDestroyed](cocos2d::EventCustom*){
+//        if (*isDestroyed)
+//            return;
+//        close();
+//    });
 }
 
 WebSocketImpl::~WebSocketImpl()
@@ -651,8 +650,9 @@ WebSocketImpl::~WebSocketImpl()
         CC_SAFE_DELETE(__wsHelper);
     }
 
-    cocos2d::Director::getInstance()->getEventDispatcher()->removeEventListener(_resetDirectorListener);
-    
+// NOTE: Refer to the comment in constructor!!!
+//    cocos2d::Director::getInstance()->getEventDispatcher()->removeEventListener(_resetDirectorListener);
+
     *_isDestroyed = true;
 }
 
@@ -1377,9 +1377,7 @@ int WebSocketImpl::onConnectionClosed()
     return 0;
 }
 
-int WebSocketImpl::onSocketCallback(struct lws *wsi,
-                     int reason,
-                     void *in, ssize_t len)
+int WebSocketImpl::onSocketCallback(struct lws *wsi, enum lws_callback_reasons reason, void* in, ssize_t len)
 {
     //LOGD("socket callback for %d reason\n", reason);
 

@@ -1,5 +1,6 @@
 /****************************************************************************
- Copyright (c) 2014-2017 Chukong Technologies Inc.
+ Copyright (c) 2014-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos2d-x.org
 
@@ -25,10 +26,13 @@
 #include "platform/CCPlatformConfig.h"
 
 #include "audio/include/AudioEngine.h"
-#include <condition_variable>
-#include <queue>
 #include "platform/CCFileUtils.h"
 #include "base/ccUtils.h"
+
+#include <condition_variable>
+#include <queue>
+#include <thread>
+#include <mutex>
 
 #if CC_TARGET_PLATFORM == CC_PLATFORM_ANDROID
 #include "audio/android/AudioEngine-inl.h"
@@ -51,7 +55,6 @@
 #endif // ERROR
 
 using namespace cocos2d;
-using namespace cocos2d::experimental;
 
 const int AudioEngine::INVALID_AUDIO_ID = -1;
 const float AudioEngine::TIME_UNKNOWN = -1.0f;
@@ -66,6 +69,7 @@ std::unordered_map<int, AudioEngine::AudioInfo> AudioEngine::_audioIDInfoMap;
 AudioEngineImpl* AudioEngine::_audioEngineImpl = nullptr;
 
 AudioEngine::AudioEngineThreadPool* AudioEngine::s_threadPool = nullptr;
+bool AudioEngine::_isEnabled = true;
 
 AudioEngine::AudioInfo::AudioInfo()
 : filePath(nullptr)
@@ -150,13 +154,13 @@ private:
 
 void AudioEngine::end()
 {
+    stopAll();
+
     if (s_threadPool)
     {
         delete s_threadPool;
         s_threadPool = nullptr;
     }
-
-    stopAll();
 
     delete _audioEngineImpl;
     _audioEngineImpl = nullptr;
@@ -192,6 +196,11 @@ int AudioEngine::play2d(const std::string& filePath, bool loop, float volume, co
     int ret = AudioEngine::INVALID_AUDIO_ID;
 
     do {
+        if (!isEnabled())
+        {
+            break;
+        }
+        
         if ( !lazyInit() ){
             break;
         }
@@ -527,6 +536,12 @@ AudioProfile* AudioEngine::getProfile(const std::string &name)
 
 void AudioEngine::preload(const std::string& filePath, std::function<void(bool isSuccess)> callback)
 {
+    if (!isEnabled())
+    {
+        callback(false);
+        return;
+    }
+    
     lazyInit();
 
     if (_audioEngineImpl)
@@ -552,3 +567,27 @@ void AudioEngine::addTask(const std::function<void()>& task)
         s_threadPool->addTask(task);
     }
 }
+
+int AudioEngine::getPlayingAudioCount()
+{
+    return static_cast<int>(_audioIDInfoMap.size());
+}
+
+void AudioEngine::setEnabled(bool isEnabled)
+{
+    if (_isEnabled != isEnabled)
+    {
+        _isEnabled = isEnabled;
+        
+        if (!_isEnabled)
+        {
+            stopAll();
+        }
+    }
+}
+
+bool AudioEngine::isEnabled()
+{
+    return _isEnabled;
+}
+

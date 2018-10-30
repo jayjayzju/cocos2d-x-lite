@@ -1,5 +1,6 @@
 /****************************************************************************
- Copyright (c) 2014-2017 Chukong Technologies Inc.
+ Copyright (c) 2014-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos2d-x.org
 
@@ -25,7 +26,7 @@
 #pragma once
 
 #include "platform/CCPlatformConfig.h"
-#include "platform/CCPlatformMacros.h"
+#include "base/ccMacros.h"
 #include "audio/include/Export.h"
 
 #include <functional>
@@ -43,8 +44,6 @@
  */
 
 NS_CC_BEGIN
-namespace experimental {
-
 /**
  * @class AudioProfile
  *
@@ -292,6 +291,21 @@ public:
      */
     static void preload(const std::string& filePath, std::function<void(bool isSuccess)> callback);
 
+    /**
+     * Gets playing audio count.
+     */
+    static int getPlayingAudioCount();
+    
+    /**
+     * Whether to enable playing audios
+     * @note If it's disabled, current playing audios will be stopped and the later 'preload', 'play2d' methods will take no effects.
+     */
+    static void setEnabled(bool isEnabled);
+    /**
+     * Check whether AudioEngine is enabled.
+     */
+    static bool isEnabled();
+    
 protected:
     static void addTask(const std::function<void()>& task);
     static void remove(int audioID);
@@ -348,10 +362,11 @@ protected:
     class AudioEngineThreadPool;
     static AudioEngineThreadPool* s_threadPool;
     
+    static bool _isEnabled;
+    
     friend class AudioEngineImpl;
 };
 
-} // namespace experimental {
 NS_CC_END
 
 // end group

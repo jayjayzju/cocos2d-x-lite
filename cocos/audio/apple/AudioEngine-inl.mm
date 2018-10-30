@@ -1,5 +1,6 @@
 /****************************************************************************
- Copyright (c) 2014-2017 Chukong Technologies Inc.
+ Copyright (c) 2014-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos2d-x.org
 
@@ -34,12 +35,11 @@
 
 #include "audio/include/AudioEngine.h"
 #include "platform/CCFileUtils.h"
-#include "base/CCDirector.h"
+#include "platform/CCApplication.h"
 #include "base/CCScheduler.h"
 #include "base/ccUtils.h"
 
 using namespace cocos2d;
-using namespace cocos2d::experimental;
 
 static ALCdevice* s_ALDevice = nullptr;
 static ALCcontext* s_ALContext = nullptr;
@@ -109,6 +109,12 @@ void AudioEngineInterruptionListenerCallback(void* user_data, UInt32 interruptio
         AudioSessionInitialize(NULL, NULL, AudioEngineInterruptionListenerCallback, self);
       }
 #endif
+    
+    BOOL success = [[AVAudioSession sharedInstance]
+                    setCategory: AVAudioSessionCategoryAmbient
+                    error: nil];
+    if (!success)
+        ALOGE("Fail to set audio session.");
     }
     return self;
 }
@@ -148,10 +154,10 @@ void AudioEngineInterruptionListenerCallback(void* user_data, UInt32 interruptio
                 NSError *error = nil;
                 [[AVAudioSession sharedInstance] setActive:YES error:&error];
                 alcMakeContextCurrent(s_ALContext);
-                if (Director::getInstance()->isPaused())
+                //IDEA:                if (Director::getInstance()->isPaused())
                 {
                     ALOGD("AVAudioSessionInterruptionTypeEnded, director was paused, try to resume it.");
-                    Director::getInstance()->resume();
+//IDEA:                    Director::getInstance()->resume();
                 }
             }
             else
@@ -190,7 +196,7 @@ void AudioEngineInterruptionListenerCallback(void* user_data, UInt32 interruptio
         else if (isAudioSessionInterrupted)
         {
             ALOGD("Audio session is still interrupted, pause director!");
-            Director::getInstance()->pause();
+            //IDEA: Director::getInstance()->pause();
         }
     }
 }
@@ -215,6 +221,7 @@ ALvoid AudioEngineImpl::myAlSourceNotificationCallback(ALuint sid, ALuint notifi
         return;
 
     AudioPlayer* player = nullptr;
+    s_instance->_threadMutex.lock();
     for (const auto& e : s_instance->_audioPlayers)
     {
         player = e.second;
@@ -223,6 +230,7 @@ ALvoid AudioEngineImpl::myAlSourceNotificationCallback(ALuint sid, ALuint notifi
             player->wakeupRotateThread();
         }
     }
+    s_instance->_threadMutex.unlock();
 }
 
 AudioEngineImpl::AudioEngineImpl()
@@ -237,7 +245,7 @@ AudioEngineImpl::~AudioEngineImpl()
 {
     if (_scheduler != nullptr)
     {
-        _scheduler->unschedule(CC_SCHEDULE_SELECTOR(AudioEngineImpl::update), this);
+        _scheduler->unschedule("AudioEngine", this);
     }
 
     if (s_ALContext) {
@@ -281,7 +289,7 @@ bool AudioEngineImpl::init()
             }
 
             for (int i = 0; i < MAX_AUDIOINSTANCES; ++i) {
-                _alSourceUsed[_alSources[i]] = false;
+                _unusedSourcesPool.push_back(_alSources[i]);
                 alSourceAddNotificationExt(_alSources[i], AL_BUFFERS_PROCESSED, myAlSourceNotificationCallback, nullptr);
             }
 
@@ -346,7 +354,7 @@ bool AudioEngineImpl::init()
 
             // ================ Workaround end ================ //
 
-            _scheduler = Director::getInstance()->getScheduler();
+            _scheduler = Application::getInstance()->getScheduler();
             ret = true;
             ALOGI("OpenAL was initialized successfully!");
         }
@@ -392,17 +400,9 @@ int AudioEngineImpl::play2d(const std::string &filePath ,bool loop ,float volume
         return AudioEngine::INVALID_AUDIO_ID;
     }
 
-    bool sourceFlag = false;
-    ALuint alSource = 0;
-    for (int i = 0; i < MAX_AUDIOINSTANCES; ++i) {
-        alSource = _alSources[i];
-
-        if ( !_alSourceUsed[alSource]) {
-            sourceFlag = true;
-            break;
-        }
-    }
-    if(!sourceFlag){
+    ALuint alSource = findValidSource();
+    if (alSource == AL_INVALID)
+    {
         return AudioEngine::INVALID_AUDIO_ID;
     }
 
@@ -426,13 +426,11 @@ int AudioEngineImpl::play2d(const std::string &filePath ,bool loop ,float volume
     _audioPlayers[_currentAudioID] = player;
     _threadMutex.unlock();
 
-    _alSourceUsed[alSource] = true;
-
     audioCache->addPlayCallback(std::bind(&AudioEngineImpl::_play2d,this,audioCache,_currentAudioID));
 
     if (_lazyInitLoop) {
         _lazyInitLoop = false;
-        _scheduler->schedule(CC_SCHEDULE_SELECTOR(AudioEngineImpl::update), this, 0.05f, false);
+        _scheduler->schedule(CC_CALLBACK_1(AudioEngineImpl::update, this), this, 0.05f, false, "AudioEngine");
     }
 
     return _currentAudioID++;
@@ -464,6 +462,18 @@ void AudioEngineImpl::_play2d(AudioCache *cache, int audioID)
             iter->second->_removeByAudioEngine = true;
         }
     }
+}
+
+ALuint AudioEngineImpl::findValidSource()
+{
+    ALuint sourceId = AL_INVALID;
+    if (!_unusedSourcesPool.empty())
+    {
+        sourceId = _unusedSourcesPool.front();
+        _unusedSourcesPool.pop_front();
+    }
+
+    return sourceId;
 }
 
 void AudioEngineImpl::setVolume(int audioID,float volume)
@@ -538,9 +548,6 @@ void AudioEngineImpl::stop(int audioID)
 {
     auto player = _audioPlayers[audioID];
     player->destroy();
-    //Note: Don't set the flag to false here, it should be set in 'update' function.
-    // Otherwise, the state got from alSourceState may be wrong
-//    _alSourceUsed[player->_alSource] = false;
 
     // Call 'update' method to cleanup immediately since the schedule may be cancelled without any notification.
     update(0.0f);
@@ -552,12 +559,6 @@ void AudioEngineImpl::stopAll()
     {
         player.second->destroy();
     }
-    //Note: Don't set the flag to false here, it should be set in 'update' function.
-    // Otherwise, the state got from alSourceState may be wrong
-//    for(int index = 0; index < MAX_AUDIOINSTANCES; ++index)
-//    {
-//        _alSourceUsed[_alSources[index]] = false;
-//    }
 
     // Call 'update' method to cleanup immediately since the schedule may be cancelled without any notification.
     update(0.0f);
@@ -654,7 +655,7 @@ void AudioEngineImpl::update(float dt)
             it = _audioPlayers.erase(it);
             _threadMutex.unlock();
             delete player;
-            _alSourceUsed[alSource] = false;
+            _unusedSourcesPool.push_back(alSource);
         }
         else if (player->_ready && sourceState == AL_STOPPED) {
 
@@ -670,11 +671,11 @@ void AudioEngineImpl::update(float dt)
             _threadMutex.unlock();
 
             if (player->_finishCallbak) {
-                player->_finishCallbak(audioID, filePath); //FIXME: callback will delay 50ms
+                player->_finishCallbak(audioID, filePath); //IDEA: callback will delay 50ms
             }
 
             delete player;
-            _alSourceUsed[alSource] = false;
+            _unusedSourcesPool.push_back(alSource);
         }
         else{
             ++it;
@@ -683,7 +684,7 @@ void AudioEngineImpl::update(float dt)
 
     if(_audioPlayers.empty()){
         _lazyInitLoop = true;
-        _scheduler->unschedule(CC_SCHEDULE_SELECTOR(AudioEngineImpl::update), this);
+        _scheduler->unschedule("AudioEngine", this);
     }
 }
 

@@ -1,5 +1,6 @@
 /****************************************************************************
- Copyright (c) 2014-2017 Chukong Technologies Inc.
+ Copyright (c) 2014-2016 Chukong Technologies Inc.
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
  http://www.cocos2d-x.org
 
@@ -34,7 +35,6 @@
 #include "platform/CCFileUtils.h"
 #include "audio/apple/AudioDecoder.h"
 
-#define VERY_VERY_VERBOSE_LOGGING
 #ifdef VERY_VERY_VERBOSE_LOGGING
 #define ALOGVV ALOGV
 #else
@@ -42,7 +42,6 @@
 #endif
 
 using namespace cocos2d;
-using namespace cocos2d::experimental;
 
 namespace {
 unsigned int __idIndex = 0;
@@ -145,7 +144,7 @@ void AudioPlayer::setCache(AudioCache* cache)
 bool AudioPlayer::play2d()
 {
     _play2dMutex.lock();
-    ALOGV("AudioPlayer::play2d, _alSource: %u", _alSource);
+    ALOGVV("AudioPlayer::play2d, _alSource: %u", _alSource);
 
     /*********************************************************************/
     /*       Note that it may be in sub thread or in main thread.       **/

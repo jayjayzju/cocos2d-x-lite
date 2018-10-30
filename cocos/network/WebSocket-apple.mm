@@ -1,31 +1,56 @@
-//
-//  WebSocket-apple.m
-//  cocos2d_libs
-//
-//  Created by James Chen on 7/3/17.
-//
-//
+/****************************************************************************
+ Copyright (c) 2017-2018 Xiamen Yaji Software Co., Ltd.
 
+ http://www.cocos.com
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy
+ of this software and associated engine source code (the "Software"), a limited,
+ worldwide, royalty-free, non-assignable, revocable and non-exclusive license
+ to use Cocos Creator solely to develop games on your target platforms. You shall
+ not use Cocos Creator software for developing other software or tools that's
+ used for developing games. You are not granted to publish, distribute,
+ sublicense, and/or sell copies of Cocos Creator.
+
+ The software or tools in this License Agreement are licensed, not sold.
+ Xiamen Yaji Software Co., Ltd. reserves all rights not expressly granted to you.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ THE SOFTWARE.
+ ****************************************************************************/
 #include "network/WebSocket.h"
 #include "base/CCData.h"
 
 #import "SocketRocket/SocketRocket.h"
 
+#if !__has_feature(objc_arc)
+#error WebSocket must be compiled with ARC enabled
+#endif
+
+static std::vector<cocos2d::network::WebSocket*>* __websocketInstances = nullptr;
+
 @interface WebSocketImpl : NSObject<SRWebSocketDelegate>
 {
-    cocos2d::network::WebSocket* _ccws;
-    cocos2d::network::WebSocket::Delegate* _delegate;
-    std::string _url;
-    std::string _selectedProtocol;
+
 }
-
-@property (nonatomic, retain) SRWebSocket* ws;
-
 @end
 
 //
 
 @implementation WebSocketImpl
+{
+    SRWebSocket* _ws;
+    cocos2d::network::WebSocket* _ccws;
+    cocos2d::network::WebSocket::Delegate* _delegate;
+
+    std::string _url;
+    std::string _selectedProtocol;
+    bool _isDestroyed;
+}
 
 -(id) initWithURL:(const std::string&) url protocols:(NSArray<NSString *> *)protocols allowsUntrustedSSLCertificates:(BOOL)allowsUntrustedSSLCertificates ws:(cocos2d::network::WebSocket*) ccws delegate:(const cocos2d::network::WebSocket::Delegate&) delegate
 {
@@ -35,37 +60,47 @@
         _delegate = const_cast<cocos2d::network::WebSocket::Delegate*>(&delegate);
         _url = url;
         NSURL* nsUrl = [[NSURL alloc] initWithString:[[NSString alloc] initWithUTF8String:_url.c_str()]];
-        self.ws = [[SRWebSocket alloc] initWithURL:nsUrl protocols:protocols allowsUntrustedSSLCertificates:allowsUntrustedSSLCertificates];
-        self.ws.delegate = self;
-        [self.ws open];
+        _ws = [[SRWebSocket alloc] initWithURL:nsUrl protocols:protocols allowsUntrustedSSLCertificates:allowsUntrustedSSLCertificates];
+        _ws.delegate = self;
+        [_ws open];
+        _isDestroyed = false;
     }
     return self;
 }
 
+-(void) dealloc
+{
+    // NSLog(@"WebSocketImpl-apple dealloc: %p, SRWebSocket ref: %ld", self, CFGetRetainCount((__bridge CFTypeRef)_ws));
+}
+
 -(void) sendString:(NSString*) message
 {
-    [self.ws sendString:message error:nil];
+    [_ws sendString:message error:nil];
 }
 
 -(void) sendData:(NSData*) data
 {
-    [self.ws sendData:data error:nil];
+    [_ws sendData:data error:nil];
 }
 
 -(void) close
 {
-    [self.ws close];
+    _isDestroyed = true;
+    _ccws->retain();
+    _delegate->onClose(_ccws);
+    [_ws close];
+    _ccws->release();
 }
 
 -(void) closeAsync
 {
-    [self.ws close];
+    [_ws close];
 }
 
 -(cocos2d::network::WebSocket::State) getReadyState
 {
     cocos2d::network::WebSocket::State ret;
-    SRReadyState state = self.ws.readyState;
+    SRReadyState state = _ws.readyState;
     switch (state) {
         case SR_OPEN:
             ret = cocos2d::network::WebSocket::State::OPEN;
@@ -102,48 +137,77 @@
 
 -(void)webSocketDidOpen:(SRWebSocket *)webSocket;
 {
-    NSLog(@"Websocket Connected");
-    if (webSocket.protocol != nil)
-        _selectedProtocol = [webSocket.protocol UTF8String];
-    _delegate->onOpen(_ccws);
+    if (!_isDestroyed)
+    {
+        // NSLog(@"Websocket Connected");
+        if (webSocket.protocol != nil)
+            _selectedProtocol = [webSocket.protocol UTF8String];
+        _delegate->onOpen(_ccws);
+    }
+    else
+    {
+        NSLog(@"WebSocketImpl webSocketDidOpen was destroyed!");
+    }
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket didFailWithError:(NSError *)error;
 {
-    NSLog(@":( Websocket Failed With Error %@", error);
-    _delegate->onError(_ccws, cocos2d::network::WebSocket::ErrorCode::UNKNOWN);
-    self.ws = nil;
+    if (!_isDestroyed)
+    {
+        NSLog(@":( Websocket Failed With Error %@", error);
+        _delegate->onError(_ccws, cocos2d::network::WebSocket::ErrorCode::UNKNOWN);
+        [self webSocket:webSocket didCloseWithCode:0 reason:@"onerror" wasClean:YES];
+    }
+    else
+    {
+        NSLog(@"WebSocketImpl didFailWithError was destroyed!");
+    }
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket didReceiveMessageWithString:(nonnull NSString *)string
 {
-    std::string message = [string UTF8String];
-    cocos2d::network::WebSocket::Data data;
-    data.bytes = (char*)message.c_str();
-    data.len = message.length() + 1;
-    data.isBinary = false;
-    data.issued = 0;
-    data.ext = nullptr;
+    if (!_isDestroyed)
+    {
+        std::string message = [string UTF8String];
+        cocos2d::network::WebSocket::Data data;
+        data.bytes = (char*)message.c_str();
+        data.len = message.length() + 1;
+        data.isBinary = false;
+        data.issued = 0;
+        data.ext = nullptr;
 
-    _delegate->onMessage(_ccws, data);
+        _delegate->onMessage(_ccws, data);
+    }
+    else
+    {
+        NSLog(@"WebSocketImpl didReceiveMessageWithString was destroyed!");
+    }
 }
 
 - (void)webSocket:(SRWebSocket *)webSocket didReceiveMessageWithData:(NSData *)nsData
 {
-    cocos2d::network::WebSocket::Data data;
-    data.bytes = (char*)nsData.bytes;
-    data.len = nsData.length;
-    data.isBinary = true;
-    data.issued = 0;
-    data.ext = nullptr;
-    _delegate->onMessage(_ccws, data);
+    if (!_isDestroyed)
+    {
+        cocos2d::network::WebSocket::Data data;
+        data.bytes = (char*)nsData.bytes;
+        data.len = nsData.length;
+        data.isBinary = true;
+        data.issued = 0;
+        data.ext = nullptr;
+        _delegate->onMessage(_ccws, data);
+    }
+    else
+    {
+        NSLog(@"WebSocketImpl didReceiveMessageWithData was destroyed!");
+    }
 }
 
-- (void)webSocket:(SRWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean;
+- (void)webSocket:(SRWebSocket *)webSocket didCloseWithCode:(NSInteger)code reason:(NSString *)reason wasClean:(BOOL)wasClean
 {
-    _delegate->onClose(_ccws);
-
-    self.ws = nil;
+    if (!_isDestroyed)
+        _delegate->onClose(_ccws);
+    else
+        NSLog(@"WebSocketImpl didCloseWithCode was destroyed!");
 }
 
 @end
@@ -155,18 +219,48 @@ namespace network {
 
 void WebSocket::closeAllConnections()
 {
+    if (__websocketInstances != nullptr)
+    {
+        ssize_t count = __websocketInstances->size();
+        for (ssize_t i = count-1; i >=0 ; i--)
+        {
+            WebSocket* instance = __websocketInstances->at(i);
+            instance->close();
+        }
 
+        __websocketInstances->clear();
+        delete __websocketInstances;
+        __websocketInstances = nullptr;
+    }
 }
 
 WebSocket::WebSocket()
 : _impl(nil)
 {
+    if (__websocketInstances == nullptr)
+    {
+        __websocketInstances = new (std::nothrow) std::vector<WebSocket*>();
+    }
 
+    __websocketInstances->push_back(this);
 }
 
 WebSocket::~WebSocket()
 {
-    _impl = nil;
+    // NSLog(@"In the destructor of WebSocket-apple (%p).", this);
+
+    if (__websocketInstances != nullptr)
+    {
+        auto iter = std::find(__websocketInstances->begin(), __websocketInstances->end(), this);
+        if (iter != __websocketInstances->end())
+        {
+            __websocketInstances->erase(iter);
+        }
+        else
+        {
+            NSLog(@"ERROR: WebSocket instance wasn't added to the container which saves websocket instances!");
+        }
+    }
 }
 
 
@@ -187,6 +281,7 @@ bool WebSocket::init(const Delegate& delegate,
         }
     }
     _impl = [[WebSocketImpl alloc] initWithURL: url protocols:nsProtocols allowsUntrustedSSLCertificates:NO ws: this delegate:delegate];
+
     return _impl != nil;
 }
 
@@ -200,7 +295,7 @@ void WebSocket::send(const std::string& message)
     }
     else
     {
-        printf("Couldn't send message since websocket wasn't opened!\n");
+        NSLog(@"Couldn't send message since websocket wasn't opened!");
     }
 }
 
@@ -214,7 +309,7 @@ void WebSocket::send(const unsigned char* binaryMsg, unsigned int len)
     }
     else
     {
-        printf("Couldn't send message since websocket wasn't opened!\n");
+        NSLog(@"Couldn't send message since websocket wasn't opened!");
     }
 }
 
@@ -223,7 +318,7 @@ void WebSocket::close()
 {
     if ([_impl getReadyState] == State::CLOSING || [_impl getReadyState] == State::CLOSED)
     {
-        printf("WebSocket (%p) was closed, no need to close it again!\n", this);
+        NSLog(@"WebSocket (%p) was closed, no need to close it again!", this);
         return;
     }
 
@@ -234,7 +329,7 @@ void WebSocket::closeAsync()
 {
     if ([_impl getReadyState] == State::CLOSING || [_impl getReadyState] == State::CLOSED)
     {
-        printf("WebSocket (%p) was closed, no need to close it again!\n", this);
+        NSLog(@"WebSocket (%p) was closed, no need to close it again!", this);
         return;
     }
 
